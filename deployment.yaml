@@ -104,7 +104,7 @@ resources:
           #!/bin/bash
           sudo mkdir /home/labs
           cd /home/labs
-          sudo git clone https://github.com/ISIS2503/ISIS2503-Microservices-AppDjango.git
+          sudo git clone https://github.com/SofRozo/ISIS2503-Microservices-AppDjango.git
           cd ISIS2503-Microservices-AppDjango
           docker network create kong-net
           docker run -d --name kong --network=kong-net --restart=always \
@@ -199,7 +199,7 @@ resources:
           #!/bin/bash
           sudo mkdir /home/labs
           cd /home/labs
-          sudo git clone https://github.com/ISIS2503/ISIS2503-Microservices-AppDjango.git
+          sudo git clone https://github.com/SofRozo/ISIS2503-Microservices-AppDjango.git
           cd ISIS2503-Microservices-AppDjango/variables
 
 - name: msd-measurements-ms
@@ -232,8 +232,75 @@ resources:
           sudo apt install python3-pip -y
           sudo mkdir /home/labs
           cd /home/labs
-          sudo git clone https://github.com/ISIS2503/ISIS2503-Microservices-AppDjango.git
+          sudo git clone https://github.com/SofRozo/ISIS2503-Microservices-AppDjango.git
           cd ISIS2503-Microservices-AppDjango/measurements
           sudo pip3 install -r requirements.txt
           sudo python3 manage.py makemigrations
           sudo python3 manage.py migrate
+
+# Nuevas instancias
+- name: msd-places-ms
+  type: compute.v1.instance
+  properties:
+    zone: us-central1-a
+    machineType: https://www.googleapis.com/compute/v1/projects/<id-proyecto>/zones/us-central1-a/machineTypes/e2-micro
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20240307b
+    networkInterfaces:
+    - network: https://www.googleapis.com/compute/v1/projects/<id-proyecto>/global/networks/default
+      networkIP: 10.128.0.86
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
+    tags:
+      items: 
+      - msd-services-firewall
+    metadata:
+      items:
+      - key: startup-script
+        value: |
+          #!/bin/bash
+          sudo apt-get update
+          sudo apt install python3-pip -y
+          sudo mkdir /home/labs
+          cd /home/labs
+          sudo git clone hhttps://github.com/SofRozo/ISIS2503-Microservices-AppDjango.git
+          cd ISIS2503-Microservices-AppDjango/places
+          sudo pip3 install -r requirements.txt
+          sudo python3 manage.py makemigrations
+          sudo python3 manage.py migrate
+
+- name: msd-places-db
+  type: compute.v1.instance
+  properties:
+    zone: us-central1-a
+    machineType: https://www.googleapis.com/compute/v1/projects/<id-proyecto>/zones/us-central1-a/machineTypes/e2-micro
+    disks:
+    - deviceName: boot
+      type: PERSISTENT
+      boot: true
+      autoDelete: true
+      initializeParams:
+        sourceImage: https://www.googleapis.com/compute/v1/projects/cos-cloud/global/images/cos-101-17162-463-8
+    networkInterfaces:
+    - network: https://www.googleapis.com/compute/v1/projects/<id-proyecto>/global/networks/default
+      networkIP: 10.128.0.87
+      accessConfigs:
+      - name: External NAT
+        type: ONE_TO_ONE_NAT
+    tags:
+      items: 
+      - msd-service-db
+    metadata:
+      items:
+      - key: startup-script
+        value: |
+          #!/bin/bash
+          docker run --restart=always -d -e POSTGRES_USER=places_user -e POSTGRES_DB=places_db -e POSTGRES_PASSWORD=isis2503 -p 5432:5432 --name places-db postgres
+
+
