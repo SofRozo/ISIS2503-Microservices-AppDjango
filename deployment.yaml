@@ -269,7 +269,7 @@ resources:
           sudo apt install python3-pip -y
           sudo mkdir /home/labs
           cd /home/labs
-          sudo git clone hhttps://github.com/SofRozo/ISIS2503-Microservices-AppDjango.git
+          sudo git clone https://github.com/SofRozo/ISIS2503-Microservices-AppDjango.git
           cd ISIS2503-Microservices-AppDjango/places
           sudo pip3 install -r requirements.txt
           sudo python3 manage.py makemigrations
